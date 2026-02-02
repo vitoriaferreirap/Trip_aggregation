@@ -8,19 +8,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController // revebe req http API REST - retorna json automatico
-@RequestMapping("/trip")
+@RequestMapping("/trips")
 public class TripController {
 
     // endpoints ( parametros entrada cliente para minha API)
     @GetMapping("/search")
-    public String searchTrips(
-            @RequestParam int id,
+    public String searchTrips( // busca cliente
             @RequestParam String origin,
             @RequestParam String destination,
-            @RequestParam LocalDate date, // apenas data sem fuso
-            @RequestParam double price,
-            @RequestParam String platform) {
-        return "Dados recebidos: " + origin + ", " + destination + ", " + date + ", " + price + ", " + platform;
+            @RequestParam LocalDate date // apenas data sem fuso
+    ) {
+        return "Dados recebidos: " + origin + ", " + destination + ", " + date;
     }
 
 }
