@@ -14,6 +14,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
+import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+
 /**
  * Esta classe é responsável por fazer SCRAPING.
  *
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DeOnibusScrapingClient {
+
+    private static final String PLATFORM_NAME = "RodoviariaCuritiba";
 
     // CONSTANTE ESTATICA GLOBAL Procura horários como:15:00
     // expresao regulares - reconhecer padrões dentro de texto
@@ -49,15 +53,15 @@ public class DeOnibusScrapingClient {
      * - origem (slug: cidade-uf)
      * - destino (slug: cidade-uf)
      * - data
-     * E devolve uma lista de viagens em texto.
+     * E devolve uma lista de TripResponse.
      */
-    public List<String> searchTrips(
+    public List<TripResponse> searchTrips(
             String originSlug,
             String destinationSlug,
             LocalDate date) {
 
         // guardar o resultado final
-        List<String> results = new ArrayList<>();
+        List<TripResponse> results = new ArrayList<>();
 
         // O site espera a data nesse formato
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -122,13 +126,21 @@ public class DeOnibusScrapingClient {
                 String arrival = extractArrivalTime(rawText);
                 String seatType = extractSeatType(rawText);
 
-                // Montagem final do resultado
-                String summary = originCity + " para " + destinationCity + " | " +
-                        "partida " + departureTime + " | " +
-                        "chegada " + arrival + " | " +
-                        seatType + " | R$ " + price;
+                // Conversão de preço
+                double priceValue = parsePrice(price);
 
-                results.add(summary);
+                // Cria o objeto TripResponse
+                TripResponse objTrip = new TripResponse(
+                        originCity,
+                        destinationCity,
+                        date,
+                        departureTime,
+                        arrival,
+                        seatType,
+                        priceValue,
+                        PLATFORM_NAME);
+
+                results.add(objTrip);
             }
 
         } catch (IOException e) {
@@ -162,5 +174,14 @@ public class DeOnibusScrapingClient {
         }
 
         return "desconhecido";
+    }
+
+    // Converte string de preço para double
+    private double parsePrice(String priceStr) {
+        try {
+            return Double.parseDouble(priceStr.replace(",", "."));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 }

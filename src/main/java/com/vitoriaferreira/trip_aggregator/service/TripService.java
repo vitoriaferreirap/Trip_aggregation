@@ -6,11 +6,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.vitoriaferreira.trip_aggregator.dto.CityResponse;
+import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
 import com.vitoriaferreira.trip_aggregator.integration.DeOnibusScrapingClient;
 
 @Service
 public class TripService {
 
+    // injecao de dependencia
     private final CityService cityService;
     private final DeOnibusScrapingClient deOnibusScrapingClient;
 
@@ -19,13 +21,13 @@ public class TripService {
         this.deOnibusScrapingClient = deOnibusScrapingClient;
     }
 
-    public List<String> searchTrips(CityResponse originCity, CityResponse destinationCity, LocalDate date) {
+    public List<TripResponse> searchTrips(CityResponse originCity, CityResponse destinationCity, LocalDate date) {
 
         // cria slugs normalizados
         String originSlug = cityService.toSlug(originCity.getNome() + "-" + originCity.getState());
         String destinationSlug = cityService.toSlug(destinationCity.getNome() + "-" + destinationCity.getState());
 
-        // chama scraping
+        // chama scraping que já retorna TripResponse
         return deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
     }
 }

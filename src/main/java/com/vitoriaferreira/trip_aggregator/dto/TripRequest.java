@@ -5,7 +5,6 @@ import java.time.LocalDate;
 public class TripRequest {
     // DTO ENTRADA - minha API solicita o que quer buscar
     // encapsulamento
-    private int id;
     private String origin;
     private String destination;
     private LocalDate date; // apenas data sem fuso

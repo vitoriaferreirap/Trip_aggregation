@@ -14,10 +14,17 @@ public class IBGECityClient {
     private static final String IBGE_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @SuppressWarnings("unchecked") // retira avisos
     public List<CityResponse> fetchAllCities() {
         // busca todas as cidades
         List<Map<String, Object>> response = restTemplate.getForObject(IBGE_URL, List.class);
 
+        // verifica se a API retornou algo
+        if (response == null) {
+            return List.of(); // retorna lista vazia
+        }
+
+        // stream()
         return response.stream().map(cityMap -> {
             CityResponse city = new CityResponse();
             city.setId(Long.valueOf(cityMap.get("id").toString()));
