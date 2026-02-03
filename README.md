@@ -2,6 +2,8 @@
 
 Este projeto tem como **objetivo principal o aprendizado de web scraping**, utilizando Java, Jsoup e uma arquitetura em camadas.
 
+Projeto **com proposito educacional**  é importante ressaltar que web scraping deve ser feito com responsabilidade ética.
+
 Embora o sistema possua características de um produto real (API REST, services, DTOs e integração com dados oficiais), o foco está em **entender como projetar, implementar e manter scrapers**, considerando que **cada site possui HTML, regras e limitações próprias**.
 
 A aplicação irá evoluir para um sistema de comparação de passagens de ônibus, agregando preços e horários de **três plataformas diferentes**.  
