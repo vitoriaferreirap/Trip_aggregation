@@ -1,41 +1,82 @@
-Cliente (browser/Postman)
-        ↓
-SUA API (Controller)
-        ↓
-Service (lógica)
-        ↓
-Scraper (chama sites externos)
-        ↓
-Normalização
-        ↓
-Resposta para o cliente
+# Sistema de Comparação de Passagens de Ônibus
 
+Este projeto tem como **objetivo principal o aprendizado de web scraping**, utilizando Java, Jsoup e uma arquitetura em camadas.
 
-O fluxo final fica assim:
-Usuário escolhe cidade → autocomplete retorna CityResponse.
-Você pega o nome da cidade e o estado → gera o slug com toSlug.
-Data da viagem → o usuário fornece, converte para LocalDate.
-Chama searchTrips(originSlug, destinationSlug, date) → monta a URL e baixa HTML.
-Jsoup percorre o DOM → extrai horários, preços e destinos.
-Retorna lista de objetos (de preferência BusTrip) para o frontend.
+Embora o sistema possua características de um produto real (API REST, services, DTOs e integração com dados oficiais), o foco está em **entender como projetar, implementar e manter scrapers**, considerando que **cada site possui HTML, regras e limitações próprias**.
 
+A aplicação irá evoluir para um sistema de comparação de passagens de ônibus, agregando preços e horários de **três plataformas diferentes**.  
+Neste primeiro momento, apenas uma plataforma está integrada.
 
-Dificuldades:
-Acessar UF do IBGE
+---
 
-| Camada / Classe                | Responsabilidade principal                                                                                     
-| **DeOnibusScrapingClient**     | Conectar no site externo, baixar HTML, parsear DOM e retornar **raw results** (Strings ou Map).                                      |
-| **TripService**                | Receber os objetos `CityResponse` (nome + estado), gerar slugs, passar para scraping e transformar **raw results em Trip_Response**. |
-| **Trip_Response (DTO)**        | Apenas representar os dados de uma viagem (origin, destination, time, price, company). **Não sabe nada de scraping**.                |
-| **CityService / CityResponse** | Obter cidades do IBGE, preencher `state`, normalização, autocomplete.                                                                |
+## Visão Geral da Arquitetura
 
+O sistema segue uma arquitetura em camadas, separando responsabilidades para evitar acoplamento entre scraping, regras de negócio e exposição da API.
+Essa separação é essencial porque **scraping é volátil**: mudanças no HTML não devem impactar controllers ou DTOs.
 
-padrao URL 
+---
+
+## Fluxo Funcional da Busca de Viagens
+
+1. Usuário escolhe cidade de origem e destino.
+2. Autocomplete retorna `CityResponse` (nome da cidade + UF) API IBGE.
+3. A aplicação gera os slugs (`toSlug`) a partir do nome e estado.
+4. Usuário informa a data da viagem (`LocalDate`).
+5. O service chama `searchTrips(originSlug, destinationSlug, date)`.
+6. A URL é montada e o HTML é baixado.
+7. Jsoup percorre o DOM e extrai horários, preços e destinos.
+8. Dados são normalizados e retornados ao frontend.
+
+---
+
+## Padrão de URL Utilizado no Scraping
+
+```
 https://rodoviariacuritiba.com.br/passagens-de-onibus/{originSlug}-para-{destinationSlug}-todos?departureDate={dd/MM/yyyy}
+```
 
+---
 
-| Controller / Service         | Função                                                                                    |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
-| CityController / CityService | Autocomplete: retorna lista de cidades + UF do IBGE, sem scraping                         |
-| TripController / TripService | Busca de viagens reais: recebe origem, destino e data, chama scraping, retorna resultados |
+## Controllers e Casos de Uso
 
+| Controller / Service | Função |
+|---------------------|--------|
+| **CityController / CityService** | Autocomplete via IBGE. Sem scraping. |
+| **TripController / TripService** | Busca real de viagens via scraping. |
+
+---
+
+## Estratégias de Extração com Jsoup
+
+### Abordagem 1 — `select().text()` (HTML estruturado)
+
+- Usada quando o HTML possui marcação confiável.
+- `select()` navega pelo DOM.
+- `.text()` retorna o valor em texto do elemento HTML.
+
+---
+
+### Abordagem 2 — `.text()` + Regex (HTML mal estruturado)
+
+- Usada quando o HTML não é confiável.
+- Extrai texto bruto do bloco.
+- Aplica Regex e regras manuais.
+
+---
+
+## Dificuldades Encontradas
+
+- Acesso correto aos dados de UF da API (IBGE).
+- Extração em páginas sem identificadores confiáveis.
+- Cada site exige uma estratégia de scraping diferente.
+
+---
+
+## Considerações Finais
+
+O foco do projeto é o **aprendizado do processo de scraping**:
+
+- Análise de HTML real
+- Arquitetura preparada para múltiplos scrapers
+- Separação clara de responsabilidades
+- Registro de decisões técnicas

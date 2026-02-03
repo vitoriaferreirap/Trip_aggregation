@@ -1,9 +1,12 @@
 package com.vitoriaferreira.trip_aggregator.integration;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,83 +15,152 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 /**
- * Classe responsável por scraping (engenharia reversa de frontend).
- * Integração com um site externo via HTTP + parse de HTML usando Jsoup
- * Função:
- * - Acessar um site externo via HTTP
- * - Baixar o HTML da página de resultados
- * - Navegar na árvore DOM
- * - Extrair dados de viagens
+ * Esta classe é responsável por fazer SCRAPING.
+ *
+ * Em termos simples:
+ * - Ela acessa um site externo
+ * - Baixa o HTML da página
+ * - Lê esse HTML como se fosse uma árvore
+ * - Extrai informações específicas de cada viagem
  */
-
-@Component // bens
+@Component
 public class DeOnibusScrapingClient {
 
-    // Executa a busca de viagens no site externo.
+    // CONSTANTE ESTATICA GLOBAL Procura horários como:15:00
+    // expresao regulares - reconhecer padrões dentro de texto
+    private static final Pattern TIME_PATTERN = Pattern.compile("\\d{2}:\\d{2}(?:\\+1)?");
 
-    // SLOGS NO FORMATO QUE O SITE ESPERA
-    public List<String> searchTrips(String originSlug,
+    /**
+     * TIPOS DE POLTRONA
+     * Lista fechada (whitelist).
+     * Se aparecer algo fora disso, ignoramos.
+     * CONSTANTE ESTATICA GLOBAL
+     * Filtro semantico
+     */
+    private static final List<String> SEAT_TYPES = List.of(
+            "semileito",
+            "leito cama",
+            "leito",
+            "convencional");
+
+    /**
+     * Método principal de scraping.
+     * Ele recebe:
+     * - origem (slug: cidade-uf)
+     * - destino (slug: cidade-uf)
+     * - data
+     * E devolve uma lista de viagens em texto.
+     */
+    public List<String> searchTrips(
+            String originSlug,
             String destinationSlug,
             LocalDate date) {
 
-        // Lista que irá armazenar os resultados extraídos
+        // guardar o resultado final
         List<String> results = new ArrayList<>();
 
-        // Montar URL de busca
-        String url = buildSearchUrl(originSlug, destinationSlug, date);
+        // O site espera a data nesse formato
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        // Baixar e parsear o HTML
-        Document document;
+        // Montagem da URL exatamente como o site usa
+        String url = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
+                + originSlug + "-para-"
+                + destinationSlug + "-todos"
+                + "?departureDate=" + formattedDate;
+
         try {
-            document = Jsoup
-                    .connect(url) // abre conexão HTTP com o site.
-                    .userAgent("Mozilla/5.0") // simula navegador real para evitar bloqueio do site
-                    .get(); // faz o GET e retorna o HTML como objeto Document
-        } catch (Exception e) {
+            /**
+             * Jsoup faz uma requisição HTTP real, recebe o HTML bruto da página e
+             * transforma esse HTML em um objeto Document. Esse Document é uma árvore DOM
+             */
+
+            // Acessa o site e baixa o HTML
+            Document document = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0") // finge ser um navegador
+                    .timeout(15_000)
+                    .get();
+
+            // INICIO EXTRACAO DE DADOS
+
+            // Seleciona cada card de viagem
+            Elements trips = document.select(
+                    "li[itemtype='https://schema.org/BusTrip']");
+
+            // Para cada viagem, extraímos os dados
+            for (Element trip : trips) {
+                // dentro dessa árvore HTML, me devolva todos os nós que representam uma viagem
+                // ex : encontre o elemento especifico que representa o preco
+                // aqui o site usou itemprop, que é uma marcação semântica estavel
+
+                // Horário de partida
+                String departureTime = trip.select("span[itemprop='departureTime']").text(); // EXRAR TEXTO DENTRO DAS
+                                                                                             // TAGS html
+
+                // Preço
+                String price = trip.select("span[itemprop='price']").text();
+
+                // Cidade de origem
+                String originCity = trip.select("div[itemprop='departureBusStop'] span")
+                        .first()
+                        .text();
+
+                // Cidade de destino
+                String destinationCity = trip.select("div[itemprop='arrivalBusStop'] span")
+                        .first()
+                        .text();
+
+                /**
+                 * Texto bruto do card inteiro.
+                 * Aqui vem TUDO misturado:
+                 * horário, duração, poltrona, embarque fácil
+                 * Feito pois nao tem atributos confiaveis para horas
+                 * ex: me de todo o texto dessa card, mesmo que baguncado
+                 */
+                String rawText = trip.text();
+
+                // Extrações usando regex e filtros
+                String arrival = extractArrivalTime(rawText);
+                String seatType = extractSeatType(rawText);
+
+                // Montagem final do resultado
+                String summary = originCity + " para " + destinationCity + " | " +
+                        "partida " + departureTime + " | " +
+                        "chegada " + arrival + " | " +
+                        seatType + " | R$ " + price;
+
+                results.add(summary);
+            }
+
+        } catch (IOException e) {
             throw new RuntimeException("Erro ao acessar o site externo.", e);
-        }
-
-        // Selecionar os elementos HTML que representam viagens
-        Elements trips = document.select(
-                "li[itemtype='https://schema.org/BusTrip']");
-
-        // Extração dos dados de cada viagem
-        for (Element trip : trips) {
-
-            String departureTime = trip.select("span[itemprop='departureTime']").text();
-
-            String price = trip.select("span[itemprop='price']").text();
-
-            String originCity = trip.select("div[itemprop='departureBusStop'] span").first().text();
-
-            String destinationCity = trip.select("div[itemprop='arrivalBusStop'] span").first().text();
-
-            // Temporário: juntar tudo em uma string
-            String summary = originCity + " -> " +
-                    destinationCity + " | " +
-                    departureTime + " | R$ " +
-                    price;
-
-            results.add(summary);
         }
 
         return results;
     }
 
-    /**
-     * Monta a URL real utilizada pelo site.
-     * replica a regra de roteamento do site
-     */
-    private String buildSearchUrl(String originSlug,
-            String destinationSlug,
-            LocalDate date) {
+    // MÉTODOS AUXILIARES
+    // A chegada e o ÚLTIMO horário que aparece no texto.
+    private String extractArrivalTime(String text) {
+        Matcher matcher = TIME_PATTERN.matcher(text);
+        String lastTime = null;
 
-        String baseUrl = "https://rodoviariacuritiba.com.br/passagens-de-onibus/";
+        while (matcher.find()) {
+            lastTime = matcher.group();
+        }
 
-        String path = originSlug + "-para-" + destinationSlug + "-todos";
+        return lastTime != null ? lastTime : "indefinido";
+    }
 
-        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    // Procura apenas tipos de poltrona válidos
+    private String extractSeatType(String text) {
+        String lowerText = text.toLowerCase();
 
-        return baseUrl + path + "?departureDate=" + formattedDate;
+        for (String seat : SEAT_TYPES) {
+            if (lowerText.contains(seat)) {
+                return seat;
+            }
+        }
+
+        return "desconhecido";
     }
 }
