@@ -9,6 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 /**
  * Classe responsável por scraping (engenharia reversa de frontend).
@@ -19,6 +20,8 @@ import org.jsoup.select.Elements;
  * - Navegar na árvore DOM
  * - Extrair dados de viagens
  */
+
+@Component // bens
 public class DeOnibusScrapingClient {
 
     // Executa a busca de viagens no site externo.

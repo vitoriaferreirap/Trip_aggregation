@@ -1,7 +1,7 @@
 package com.vitoriaferreira.trip_aggregator.integration;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -10,16 +10,34 @@ import com.vitoriaferreira.trip_aggregator.dto.CityResponse;
 
 @Component
 public class IBGECityClient {
-    // faz requisicao HTPP para IBGE e tranforma a res em obj Java - CityResponse
-    private static final String IBGE_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
 
+    private static final String IBGE_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<CityResponse> fetchAllCities() {
-        // RestTemplate.getForObject: envia uma requisição GET para a URL e espera
-        // receber um JSON que será convertido para um array de CityResponse
-        CityResponse[] response = restTemplate.getForObject(IBGE_URL, CityResponse[].class);
+        // busca todas as cidades
+        List<Map<String, Object>> response = restTemplate.getForObject(IBGE_URL, List.class);
 
-        return Arrays.asList(response);// converte array em lista
+        return response.stream().map(cityMap -> {
+            CityResponse city = new CityResponse();
+            city.setId(Long.valueOf(cityMap.get("id").toString()));
+            city.setNome((String) cityMap.get("nome"));
+
+            // pegar UF de forma segura
+            Map<String, Object> microrregiao = (Map<String, Object>) cityMap.get("microrregiao");
+            String uf = "";
+            if (microrregiao != null) {
+                Map<String, Object> mesorregiao = (Map<String, Object>) microrregiao.get("mesorregiao");
+                if (mesorregiao != null) {
+                    Map<String, Object> ufMap = (Map<String, Object>) mesorregiao.get("UF");
+                    if (ufMap != null) {
+                        uf = (String) ufMap.get("sigla"); // pega a sigla da UF
+                    }
+                }
+            }
+            city.setState(uf);
+
+            return city;
+        }).toList();
     }
 }

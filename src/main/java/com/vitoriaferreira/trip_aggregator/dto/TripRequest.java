@@ -2,7 +2,7 @@ package com.vitoriaferreira.trip_aggregator.dto;
 
 import java.time.LocalDate;
 
-public class Trip_Request {
+public class TripRequest {
     // DTO ENTRADA - minha API solicita o que quer buscar
     // encapsulamento
     private int id;
@@ -11,7 +11,7 @@ public class Trip_Request {
     private LocalDate date; // apenas data sem fuso
 
     // construtor
-    public Trip_Request() {
+    public TripRequest() {
     }
 
     public String getOrigin() {

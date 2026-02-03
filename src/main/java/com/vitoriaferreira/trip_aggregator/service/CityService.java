@@ -27,15 +27,20 @@ public class CityService {
 
         return ibgeCityClient.fetchAllCities().stream() // Filtra apenas as que começam com a query normalizada.
                 .filter(city -> normalize(city.getNome()).startsWith(normalizedQuery))
-                .map(CityResponse::getNome) // só o nome da cidade
+                .map(city -> city.getNome() + "-" + city.getState())
                 .limit(10) // Lista é filtrada, normalizada e limitada a 10 resultados
                 .collect(Collectors.toList());
     }
 
-    // SLUG - troca espacos por hifens
+    // SLUG - cidade - troca espacos por hifens
     public String toSlug(String city) {
         return normalize(city)
                 .replace(" ", "-");
+    }
+
+    // SLUG - estado
+    public String toSlugWithState(CityResponse city) {
+        return toSlug(city.getNome() + " " + city.getState()); // ex: "Curitiba PR" -> "curitiba-pr"
     }
 
     // Normalizacao - remove acentos e caracteres especiais

@@ -4,6 +4,7 @@ public class CityResponse {
     // mapea dados retornados do ibge em JSON para obj JAVA
     private Long id;
     private String nome;
+    private String state; // sigla estado
 
     public Long getId() {
         return id;
@@ -20,4 +21,13 @@ public class CityResponse {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
 }

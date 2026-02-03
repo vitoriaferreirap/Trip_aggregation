@@ -5,27 +5,27 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vitoriaferreira.trip_aggregator.dto.Trip_Response;
+import com.vitoriaferreira.trip_aggregator.dto.CityResponse;
+import com.vitoriaferreira.trip_aggregator.integration.DeOnibusScrapingClient;
 
-/*
-Regra de negocio: 
-receber dados de busca
-devolver viagens encontradas
-retornar obj bem definidos
-*/
 @Service
 public class TripService {
 
-    public List<Trip_Response> searchTrips(String origin, String destination, LocalDate date) {
-        // simulacao de dados - mock
-        // Receber critérios de busca e produzir uma lista de viagens possíveis.
-        Trip_Response trip1 = new Trip_Response(
-                origin,
-                destination,
-                date,
-                170.00,
-                "ClickBus");
-        return List.of(trip1);
+    private final CityService cityService;
+    private final DeOnibusScrapingClient deOnibusScrapingClient;
+
+    public TripService(CityService cityService, DeOnibusScrapingClient deOnibusScrapingClient) {
+        this.cityService = cityService;
+        this.deOnibusScrapingClient = deOnibusScrapingClient;
     }
 
+    public List<String> searchTrips(CityResponse originCity, CityResponse destinationCity, LocalDate date) {
+
+        // cria slugs normalizados
+        String originSlug = cityService.toSlug(originCity.getNome() + "-" + originCity.getState());
+        String destinationSlug = cityService.toSlug(destinationCity.getNome() + "-" + destinationCity.getState());
+
+        // chama scraping
+        return deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
+    }
 }

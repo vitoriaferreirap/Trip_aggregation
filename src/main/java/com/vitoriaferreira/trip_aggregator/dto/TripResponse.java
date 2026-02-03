@@ -2,7 +2,7 @@ package com.vitoriaferreira.trip_aggregator.dto;
 
 import java.time.LocalDate;
 
-public class Trip_Response {
+public class TripResponse {
     // DTO Saida - minha API DEVOLVE depois de processar a busca.
     // encapsulamento
     // modelo dados da API
@@ -13,7 +13,7 @@ public class Trip_Response {
     private String platform;
 
     // construtor
-    public Trip_Response(String origin, String destination, LocalDate date, double price, String platform) {
+    public TripResponse(String origin, String destination, LocalDate date, double price, String platform) {
         this.origin = origin;
         this.destination = destination;
         this.date = date;
