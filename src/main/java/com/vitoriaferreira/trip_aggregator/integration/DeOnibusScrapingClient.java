@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,10 +28,6 @@ public class DeOnibusScrapingClient {
 
     private static final String PLATFORM_NAME = "RodoviariaCuritiba";
 
-    // CONSTANTE ESTATICA GLOBAL Procura horários como:15:00
-    // expresao regulares - reconhecer padrões dentro de texto
-    private static final Pattern TIME_PATTERN = Pattern.compile("\\d{2}:\\d{2}(?:\\+1)?");
-
     /**
      * TIPOS DE POLTRONA
      * Lista fechada (whitelist).
@@ -45,7 +39,8 @@ public class DeOnibusScrapingClient {
             "semileito",
             "leito cama",
             "leito",
-            "convencional");
+            "convencional",
+            "executivo");
 
     /**
      * Método principal de scraping.
@@ -85,23 +80,25 @@ public class DeOnibusScrapingClient {
                     .get();
 
             // INICIO EXTRACAO DE DADOS
-
-            // Seleciona cada card de viagem
-            Elements trips = document.select(
-                    "li[itemtype='https://schema.org/BusTrip']");
+            // Seleciona cada card de viagem - elemento PAI
+            Elements trips = document.select("li[itemtype='https://schema.org/BusTrip']");
 
             // Para cada viagem, extraímos os dados
             for (Element trip : trips) {
                 // dentro dessa árvore HTML, me devolva todos os nós que representam uma viagem
-                // ex : encontre o elemento especifico que representa o preco
                 // aqui o site usou itemprop, que é uma marcação semântica estavel
 
                 // Horário de partida
-                String departureTime = trip.select("span[itemprop='departureTime']").text(); // EXRAR TEXTO DENTRO DAS
-                                                                                             // TAGS html
+                String departureTime = trip.select("span[itemprop='departureTime']")
+                        .text(); // EXRAR TEXTO DENTRO DAS
+
+                // Horario de chegada
+                String arrivalTime = trip.selectFirst("span[itemprop='arrivalTime']")
+                        .text();
 
                 // Preço
-                String price = trip.select("span[itemprop='price']").text();
+                String price = trip.select("span[itemprop='price']")
+                        .text();
 
                 // Cidade de origem
                 String originCity = trip.select("div[itemprop='departureBusStop'] span")
@@ -120,16 +117,14 @@ public class DeOnibusScrapingClient {
                  * Texto bruto do card inteiro.
                  * Aqui vem TUDO misturado:
                  * horário, duração, poltrona, embarque fácil
-                 * Feito pois nao tem atributos confiaveis para horas
                  * ex: me de todo o texto dessa card, mesmo que baguncado
                  */
                 String rawText = trip.text();
 
-                // Extrações usando regex e filtros
-                String arrival = extractArrivalTime(rawText);
+                // CONVERSOES:
+                // Extrações usando lista para filtros
                 String seatType = extractSeatType(rawText);
-
-                // Conversão de preço
+                // Conversão de preço - string para double
                 double priceValue = parsePrice(price);
 
                 // Cria o objeto TripResponse
@@ -138,7 +133,7 @@ public class DeOnibusScrapingClient {
                         destinationCity,
                         date,
                         departureTime,
-                        arrival,
+                        arrivalTime,
                         seatType,
                         priceValue,
                         provider,
@@ -154,19 +149,7 @@ public class DeOnibusScrapingClient {
         return results;
     }
 
-    // MÉTODOS AUXILIARES
-    // A chegada e o ÚLTIMO horário que aparece no texto.
-    private String extractArrivalTime(String text) {
-        Matcher matcher = TIME_PATTERN.matcher(text);
-        String lastTime = null;
-
-        while (matcher.find()) {
-            lastTime = matcher.group();
-        }
-
-        return lastTime != null ? lastTime : "indefinido";
-    }
-
+    // metodos auxiliares que ajudam na filtragem
     // Procura apenas tipos de poltrona válidos
     private String extractSeatType(String text) {
         String lowerText = text.toLowerCase();
