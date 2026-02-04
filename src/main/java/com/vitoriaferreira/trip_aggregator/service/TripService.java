@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vitoriaferreira.trip_aggregator.dto.CityResponse;
+import com.vitoriaferreira.trip_aggregator.dto.TripRequest;
 import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
 import com.vitoriaferreira.trip_aggregator.integration.DeOnibusScrapingClient;
 
@@ -16,18 +16,24 @@ public class TripService {
     private final CityService cityService;
     private final DeOnibusScrapingClient deOnibusScrapingClient;
 
+    // construtor - entra apenas dependencias que o service usa para trabalhar, nao
+    // dados de entrada
     public TripService(CityService cityService, DeOnibusScrapingClient deOnibusScrapingClient) {
         this.cityService = cityService;
         this.deOnibusScrapingClient = deOnibusScrapingClient;
     }
 
-    public List<TripResponse> searchTrips(CityResponse originCity, CityResponse destinationCity, LocalDate date) {
+    // metodo
+    public List<TripResponse> searchTrips(TripRequest request) {
 
-        // cria slugs normalizados cidade-uf
-        String originSlug = cityService.toSlug(originCity.getNome() + "-" + originCity.getState());
-        String destinationSlug = cityService.toSlug(destinationCity.getNome() + "-" + destinationCity.getState());
+        // request.getOrigin() - apenas transporta dados de entrada/ dto para leitura
+        // dado devolvido - retorno ja resolvido - slug e normalizacao
+        // cityService.toSlug(originSlug) - string normalizada retorn
+        String originSlug = cityService.toSlug(request.getOrigin());
+        String destinationSlug = cityService.toSlug(request.getDestination());
+        LocalDate date = request.getDate();
 
-        // chama scraping que já retorna TripResponse
+        // nao executa nada novo, na volta ira retornar o que o scraping ja produziu
         return deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
     }
 }
