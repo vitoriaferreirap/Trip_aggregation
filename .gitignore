@@ -1,3 +1,7 @@
+# Environment / Secrets
+.env
+application-local.properties
+
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar

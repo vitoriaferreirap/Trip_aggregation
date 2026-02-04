@@ -3,12 +3,11 @@ package com.vitoriaferreira.trip_aggregator.entity;
 import java.time.Instant;
 import java.time.LocalDate;
 
-import org.springframework.data.annotation.Id;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 //Representar um registro histórico imutável de preço coletado em um instante específico.
 @Entity
