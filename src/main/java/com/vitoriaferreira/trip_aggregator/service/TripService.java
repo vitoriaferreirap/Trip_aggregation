@@ -23,7 +23,7 @@ public class TripService {
 
     public List<TripResponse> searchTrips(CityResponse originCity, CityResponse destinationCity, LocalDate date) {
 
-        // cria slugs normalizados
+        // cria slugs normalizados cidade-uf
         String originSlug = cityService.toSlug(originCity.getNome() + "-" + originCity.getState());
         String destinationSlug = cityService.toSlug(destinationCity.getNome() + "-" + destinationCity.getState());
 

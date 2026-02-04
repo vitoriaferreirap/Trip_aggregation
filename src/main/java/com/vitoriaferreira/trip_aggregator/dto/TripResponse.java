@@ -13,12 +13,13 @@ public class TripResponse {
     private String arrivalTime;
     private String seatType;
     private double price;
+    private String provider;
     private String platform; // da qual esta fazendo o scraping
 
     // construtor
     public TripResponse(String origin, String destination, LocalDate date,
             String departureTime, String arrivalTime, String seatType,
-            double price, String platform) {
+            double price, String provider, String platform) {
         this.origin = origin;
         this.destination = destination;
         this.date = date;
@@ -27,6 +28,7 @@ public class TripResponse {
         this.seatType = seatType;
         this.price = price;
         this.platform = platform;
+        this.provider = provider;
     }
 
     // necessario para a resposta do servidor
@@ -94,48 +96,12 @@ public class TripResponse {
         this.platform = platform;
     }
 
-    /**
-     * Converte uma string formatada em um objeto TripResponse.
-     * Formato esperado: "Cidade - UF para Cidade - UF | partida HH:MM | chegada
-     * HH:MM | tipoPoltrona | R$ valor"
-     * 
-     * Exemplo: "Curitiba - PR para Florianópolis - SC | partida 18:30 | chegada
-     * 00:10 | leito | R$ 119,99"
-     */
-    public static TripResponse fromString(String tripString, LocalDate date, String platform) {
-        try {
-            // Divide por pipes (|)
-            String[] parts = tripString.split("\\|");
+    public String getProvider() {
+        return provider;
+    }
 
-            if (parts.length < 5) {
-                throw new IllegalArgumentException("Formato de string inválido");
-            }
-
-            // Extrai origem e destino
-            String[] cities = parts[0].trim().split("para");
-            String origin = cities[0].trim();
-            String destination = cities.length > 1 ? cities[1].trim() : "Desconhecido";
-
-            // Extrai horário de partida (ex: "partida 18:30")
-            String departureStr = parts[1].trim();
-            String departureTime = departureStr.replaceAll("partida\\s*", "").trim();
-
-            // Extrai horário de chegada (ex: "chegada 00:10")
-            String arrivalStr = parts[2].trim();
-            String arrivalTime = arrivalStr.replaceAll("chegada\\s*", "").trim();
-
-            // Extrai tipo de poltrona
-            String seatType = parts[3].trim();
-
-            // Extrai preço (ex: "R$ 119,99")
-            String priceStr = parts[4].trim();
-            double price = Double.parseDouble(priceStr.replaceAll("[R$\\s]", "").replace(",", "."));
-
-            return new TripResponse(origin, destination, date, departureTime, arrivalTime, seatType, price, platform);
-
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Erro ao fazer parsing da string de viagem: " + tripString, e);
-        }
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
 }

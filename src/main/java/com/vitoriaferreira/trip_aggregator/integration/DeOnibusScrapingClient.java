@@ -113,6 +113,9 @@ public class DeOnibusScrapingClient {
                         .first()
                         .text();
 
+                // operador de viacao - empresa onibus
+                String provider = trip.selectFirst("div[itemprop='Provider'] span").text();
+
                 /**
                  * Texto bruto do card inteiro.
                  * Aqui vem TUDO misturado:
@@ -138,6 +141,7 @@ public class DeOnibusScrapingClient {
                         arrival,
                         seatType,
                         priceValue,
+                        provider,
                         PLATFORM_NAME);
 
                 results.add(objTrip);
