@@ -16,14 +16,16 @@ public class TripService {
     private final CityService cityService;
     private final DeOnibusScrapingClient deOnibusScrapingClient;
     private final PriceSnapshotService priceSnapshotService;
+    private final PricingComparisonService pricingComparisonService;
 
     // construtor - entra apenas dependencias que o service usa para trabalhar, nao
     // dados de entrada
     public TripService(CityService cityService, DeOnibusScrapingClient deOnibusScrapingClient,
-            PriceSnapshotService priceSnapshotService) {
+            PriceSnapshotService priceSnapshotService, PricingComparisonService pricingComparisonService) {
         this.cityService = cityService;
         this.deOnibusScrapingClient = deOnibusScrapingClient;
         this.priceSnapshotService = priceSnapshotService;
+        this.pricingComparisonService = pricingComparisonService;
     }
 
     // metodo
@@ -40,7 +42,8 @@ public class TripService {
         List<TripResponse> scrapedTrip = deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
 
         // Recebe retorno do findCheapestTrip
-        TripResponse cheapestTrip = findCheapestTrip(scrapedTrip);
+        // esse server orquestra essa operacao, incia e finaliza
+        TripResponse cheapestTrip = pricingComparisonService.findCheapestTrip(scrapedTrip);
         System.out.println("MAIS BARATA: " + cheapestTrip.getcompany() + cheapestTrip.getPrice());
 
         /**
@@ -63,32 +66,4 @@ public class TripService {
         return scrapedTrip;
     }
 
-    // AGREGANDO VALOR - COMPARACAO DE PRECO MAIS BAIXO DA BUSCA
-    private TripResponse findCheapestTrip(List<TripResponse> trips) {
-
-        // armazena mais barata = nao sei o que e mais barato ainda
-        TripResponse cheapest = null;
-
-        for (TripResponse trip : trips) {
-            // primeiro laco ainda nao tem comparacoes
-            // ao ter a primeira comparacao, excecuta o fluxo todo
-            if (cheapest == null) {
-                cheapest = trip;
-                continue; // ja entende que precisa ir pro proximo loop direto
-            }
-
-            /**
-             * comparacao preco - segunda comparacao em diant
-             * a.compareTo(b)
-             * < 0 = a menor
-             * 0 = a e b igual
-             * > 0 = a maior
-             */
-            if (trip.getPrice().compareTo(cheapest.getPrice()) < 0) {
-                // trip atual menor
-                cheapest = trip;
-            }
-        }
-        return cheapest;
-    }
 }
