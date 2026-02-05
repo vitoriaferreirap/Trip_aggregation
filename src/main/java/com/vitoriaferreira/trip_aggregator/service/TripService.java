@@ -46,22 +46,9 @@ public class TripService {
         TripResponse cheapestTrip = pricingComparisonService.findCheapestTrip(scrapedTrip);
         System.out.println("MAIS BARATA: " + cheapestTrip.getcompany() + cheapestTrip.getPrice());
 
-        /**
-         * SALVA RESULTADO NO BANCO
-         * passa apenas os dados do DTO (TripResponse) para o service, que constrói a
-         * entidade e salva.
-         */
-        for (TripResponse trip : scrapedTrip) {
-            priceSnapshotService.savePrice(
-                    trip.getOrigin(),
-                    trip.getDestination(),
-                    trip.getDate(),
-                    trip.getDepartureTime(),
-                    trip.getArrivalTime(),
-                    trip.getSeatType(),
-                    trip.getcompany(),
-                    trip.getPrice());
-        }
+        // delegacao de responsavilidade
+        priceSnapshotService.saveAll(scrapedTrip);
+
         // nao executa nada novo, na volta ira retornar o que o scraping ja produziu
         return scrapedTrip;
     }
