@@ -1,6 +1,7 @@
 package com.vitoriaferreira.trip_aggregator.integration;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -124,8 +125,10 @@ public class DeOnibusScrapingClient {
                 // CONVERSOES:
                 // Extrações usando lista para filtros
                 String seatType = extractSeatType(rawText);
-                // Conversão de preço - string para double
-                double priceValue = parsePrice(price);
+
+                // Conversão de preço - string para BigDecima
+                // remove separacao de milhar e converte o separador decimap para padrao java
+                BigDecimal priceValue = new BigDecimal(price.replace(".", "").replace(",", "."));
 
                 // Cria o objeto TripResponse
                 TripResponse objTrip = new TripResponse(
@@ -163,12 +166,4 @@ public class DeOnibusScrapingClient {
         return "desconhecido";
     }
 
-    // Converte string de preço para double
-    private double parsePrice(String priceStr) {
-        try {
-            return Double.parseDouble(priceStr.replace(",", "."));
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
 }

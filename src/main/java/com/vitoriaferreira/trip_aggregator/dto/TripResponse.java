@@ -1,5 +1,6 @@
 package com.vitoriaferreira.trip_aggregator.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TripResponse {
@@ -12,14 +13,14 @@ public class TripResponse {
     private String departureTime;
     private String arrivalTime;
     private String seatType;
-    private double price;
+    private BigDecimal price;
     private String company;
     private String platform; // da qual esta fazendo o scraping
 
     // construtor
     public TripResponse(String origin, String destination, LocalDate date,
             String departureTime, String arrivalTime, String seatType,
-            double price, String company, String platform) {
+            BigDecimal price, String company, String platform) {
         this.origin = origin;
         this.destination = destination;
         this.date = date;
@@ -36,72 +37,36 @@ public class TripResponse {
         return origin;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
     public String getDestination() {
         return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public String getDepartureTime() {
         return departureTime;
-    }
-
-    public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
     }
 
     public String getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(String arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
     public String getSeatType() {
         return seatType;
     }
 
-    public void setSeatType(String seatType) {
-        this.seatType = seatType;
-    }
-
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public String getPlatform() {
         return platform;
     }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
     public String getcompany() {
         return company;
-    }
-
-    public void setcompany(String company) {
-        this.company = company;
     }
 
 }
