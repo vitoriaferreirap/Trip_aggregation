@@ -1,5 +1,6 @@
 package com.vitoriaferreira.trip_aggregator.service;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -20,19 +21,19 @@ public class PriceSnapshotService {
 
     // metodo para salvar busca
     public PriceSnapshot savePrice(String originCity, String destinationCity,
-            String company, LocalDate travelDate,
+            LocalDate travelDate,
             String departureTime, String arrivalTime,
-            String seatType, double price) {
+            String seatType, String company, BigDecimal price) {
 
         // intancia novo obj
         PriceSnapshot snapshot = new PriceSnapshot(
                 originCity,
                 destinationCity,
-                company,
                 travelDate,
                 departureTime,
                 arrivalTime,
                 seatType,
+                company,
                 price,
                 Instant.now() // momento da coleta
         );

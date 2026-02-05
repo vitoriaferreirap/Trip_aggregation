@@ -1,5 +1,6 @@
 package com.vitoriaferreira.trip_aggregator.entity;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -9,7 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-//Representar um registro histórico imutável de preço coletado em um instante específico.
+// modela como os dados são armazenados no banco. Usa JPA/HIBERNAT
+// específico.
 @Entity
 public class PriceSnapshot {
 
@@ -18,27 +20,26 @@ public class PriceSnapshot {
     private Long id;
     private String originCity;
     private String destinationCity;
-    private String company;
     private LocalDate travelDate;
     private String departureTime;
     private String arrivalTime;
     private String seatType;
-    private double price;
+    private String company;
+    private BigDecimal price; // guarda zeros apos .
 
     // mesmo que alguém tente update, o Hibernate não inclui o campo no SQL
     @Column(nullable = false, updatable = false)
     private Instant collectedAt;// data e hora do momento da coleta
 
-    public PriceSnapshot(String originCity, String destinationCity, String company, LocalDate travelDate,
-            String departureTime, String arrivalTime, String seatType, double price, Instant collectedAt) {
-
+    public PriceSnapshot(String originCity, String destinationCity, LocalDate travelDate, String departureTime,
+            String arrivalTime, String seatType, String company, BigDecimal price, Instant collectedAt) {
         this.originCity = originCity;
         this.destinationCity = destinationCity;
-        this.company = company;
         this.travelDate = travelDate;
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.seatType = seatType;
+        this.company = company;
         this.price = price;
         this.collectedAt = collectedAt;
     }
@@ -53,10 +54,6 @@ public class PriceSnapshot {
 
     public String getDestinationCity() {
         return destinationCity;
-    }
-
-    public String getCompany() {
-        return company;
     }
 
     public LocalDate getTravelDate() {
@@ -75,7 +72,11 @@ public class PriceSnapshot {
         return seatType;
     }
 
-    public double getPrice() {
+    public String getCompany() {
+        return company;
+    }
+
+    public BigDecimal getPrice() {
         return price;
     }
 

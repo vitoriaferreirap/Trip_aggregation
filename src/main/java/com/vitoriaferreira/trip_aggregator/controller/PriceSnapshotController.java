@@ -26,11 +26,11 @@ public class PriceSnapshotController {
         return service.savePrice(
                 snapshot.getOriginCity(),
                 snapshot.getDestinationCity(),
-                snapshot.getCompany(),
                 snapshot.getTravelDate(),
                 snapshot.getDepartureTime(),
                 snapshot.getArrivalTime(),
                 snapshot.getSeatType(),
+                snapshot.getCompany(),
                 snapshot.getPrice());
     }
 }
