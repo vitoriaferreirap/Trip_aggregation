@@ -25,7 +25,8 @@ public class PriceSnapshotService {
             String departureTime, String arrivalTime,
             String seatType, String company, BigDecimal price) {
 
-        // intancia novo obj
+        // intancia novo obj - ;recupera dados passado como paramentro TripResponse e
+        // tranforma em um novo obj a entidade
         PriceSnapshot snapshot = new PriceSnapshot(
                 originCity,
                 destinationCity,

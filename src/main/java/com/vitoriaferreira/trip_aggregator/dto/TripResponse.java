@@ -13,13 +13,13 @@ public class TripResponse {
     private String arrivalTime;
     private String seatType;
     private double price;
-    private String provider;
+    private String company;
     private String platform; // da qual esta fazendo o scraping
 
     // construtor
     public TripResponse(String origin, String destination, LocalDate date,
             String departureTime, String arrivalTime, String seatType,
-            double price, String provider, String platform) {
+            double price, String company, String platform) {
         this.origin = origin;
         this.destination = destination;
         this.date = date;
@@ -28,7 +28,7 @@ public class TripResponse {
         this.seatType = seatType;
         this.price = price;
         this.platform = platform;
-        this.provider = provider;
+        this.company = company;
     }
 
     // necessario para a resposta do servidor
@@ -96,12 +96,12 @@ public class TripResponse {
         this.platform = platform;
     }
 
-    public String getProvider() {
-        return provider;
+    public String getcompany() {
+        return company;
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
+    public void setcompany(String company) {
+        this.company = company;
     }
 
 }

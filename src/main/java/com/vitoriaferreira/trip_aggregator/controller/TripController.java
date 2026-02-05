@@ -20,9 +20,16 @@ public class TripController {
         this.tripService = tripService;
     }
 
+    /**
+     * Esse GET recebe a busca (TripRequest)
+     * Chama o TripService.searchTrips(request)
+     * Retorna a lista de viagens (TripResponse) para o front-end
+     * 
+     * ATO DE PESQUISAR JA SALVARA NO BANCO OS DADOS DA PESQUISA
+     */
+
     @GetMapping("/search")
     public List<TripResponse> searchTrips(TripRequest request) {
-
         // controller(TripRequest) -> TripService(originSlug) -> CityService(slug) - >
         // scrapgClient(searchTrips) (ida)
         return tripService.searchTrips(request);
