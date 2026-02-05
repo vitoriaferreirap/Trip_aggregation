@@ -16,61 +16,71 @@ public class PriceSnapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String origin_city;
-    private String destination_city;
-    private LocalDate travel_date;
-    private String departure_time;
-    private String arrival_time;
+    private String originCity;
+    private String destinationCity;
     private String company;
-    private String seat_type;
+    private LocalDate travelDate;
+    private String departureTime;
+    private String arrivalTime;
+    private String seatType;
     private double price;
 
     // mesmo que alguém tente update, o Hibernate não inclui o campo no SQL
     @Column(nullable = false, updatable = false)
     private Instant collectedAt;// data e hora do momento da coleta
 
-    public PriceSnapshot(String origin_city, String destination_city, LocalDate travel_date, String departure_time,
-            String arrival_time, String company, String seat_type, double price) {
-        this.origin_city = origin_city;
-        this.destination_city = destination_city;
-        this.travel_date = travel_date;
-        this.departure_time = departure_time;
-        this.arrival_time = arrival_time;
+    public PriceSnapshot(String originCity, String destinationCity, String company, LocalDate travelDate,
+            String departureTime, String arrivalTime, String seatType, double price, Instant collectedAt) {
+
+        this.originCity = originCity;
+        this.destinationCity = destinationCity;
         this.company = company;
-        this.seat_type = seat_type;
+        this.travelDate = travelDate;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.seatType = seatType;
         this.price = price;
+        this.collectedAt = collectedAt;
     }
 
-    public String getOrigin_city() {
-        return origin_city;
+    public Long getId() {
+        return id;
     }
 
-    public String getDestination_city() {
-        return destination_city;
+    public String getOriginCity() {
+        return originCity;
     }
 
-    public LocalDate getTravel_date() {
-        return travel_date;
-    }
-
-    public String getDeparture_time() {
-        return departure_time;
-    }
-
-    public String getArrival_time() {
-        return arrival_time;
+    public String getDestinationCity() {
+        return destinationCity;
     }
 
     public String getCompany() {
         return company;
     }
 
-    public String getSeat_type() {
-        return seat_type;
+    public LocalDate getTravelDate() {
+        return travelDate;
+    }
+
+    public String getDepartureTime() {
+        return departureTime;
+    }
+
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public String getSeatType() {
+        return seatType;
     }
 
     public double getPrice() {
         return price;
+    }
+
+    public Instant getCollectedAt() {
+        return collectedAt;
     }
 
 }
