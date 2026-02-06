@@ -72,7 +72,16 @@ https://rodoviariacuritiba.com.br/passagens-de-onibus/{originSlug}-para-{destina
 - Extração em páginas sem identificadores confiáveis.
 - Cada site exige uma estratégia de scraping diferente.
 
+- Detectar variações relevantes de preço ao longo do tempo para a mesma rota e gerar alertas automáticos quando houver queda significativa em relação ao histórico recente.
+
 ---
+
+## Analise media e porcentual
+- Preço fora do padrão histórico
+- “Essa passagem está mais barata do que o normal para essa rota.”
+- Detectar quando o preço atual de uma rota está abaixo do padrão histórico dessa mesma rota.
+- “O preço atual dessa rota está barato comparado com o que normalmente custa?”
+- Se sim → gera alerta.
 
 ## Considerações Finais
 

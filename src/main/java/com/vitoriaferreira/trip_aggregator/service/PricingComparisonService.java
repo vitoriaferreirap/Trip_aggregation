@@ -2,8 +2,11 @@ package com.vitoriaferreira.trip_aggregator.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
 
+@Service
 public class PricingComparisonService {
     // AGREGANDO VALOR - COMPARACAO DE PRECO MAIS BAIXO DA BUSCA
     public TripResponse findCheapestTrip(List<TripResponse> trips) {
