@@ -19,7 +19,8 @@ public class PriceSnapshotService {
         this.repository = repository;
     }
 
-    public void saveAll(List<TripResponse> trips) {
+    // parametro que define quantos obj seram salvos por vez
+    public void save(List<TripResponse> trips) {
 
         for (TripResponse trip : trips) {
             PriceSnapshot snapshot = new PriceSnapshot(
@@ -29,7 +30,7 @@ public class PriceSnapshotService {
                     trip.getDepartureTime(),
                     trip.getArrivalTime(),
                     trip.getSeatType(),
-                    trip.getcompany(),
+                    trip.getCompany(),
                     trip.getPrice(),
                     Instant.now());
 

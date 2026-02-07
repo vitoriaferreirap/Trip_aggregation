@@ -44,10 +44,10 @@ public class TripService {
         // Recebe retorno do findCheapestTrip
         // esse server orquestra essa operacao, incia e finaliza
         TripResponse cheapestTrip = pricingComparisonService.findCheapestTrip(scrapedTrip);
-        System.out.println("MAIS BARATA: " + cheapestTrip.getcompany() + cheapestTrip.getPrice());
+        System.out.println("MAIS BARATA: " + cheapestTrip.getCompany() + " " + cheapestTrip.getPrice());
 
         // delegacao de responsavilidade
-        priceSnapshotService.saveAll(scrapedTrip);
+        priceSnapshotService.save(scrapedTrip);
 
         // nao executa nada novo, na volta ira retornar o que o scraping ja produziu
         return scrapedTrip;

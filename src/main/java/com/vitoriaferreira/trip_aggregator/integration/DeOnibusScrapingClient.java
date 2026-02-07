@@ -63,26 +63,39 @@ public class DeOnibusScrapingClient {
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         // Montagem da URL exatamente como o site usa
-        String url = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
-                + originSlug + "-para-"
-                + destinationSlug + "-todos"
+        String urlWithTodos = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
+                + originSlug + "-todos-para-" + destinationSlug + "-todos"
                 + "?departureDate=" + formattedDate;
 
+        String urlWithoutTodos = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
+                + originSlug + "-para-" + destinationSlug + "-todos"
+                + "?departureDate=" + formattedDate;
+
+        Elements trips = new Elements();
         try {
             /**
              * Jsoup faz uma requisição HTTP real, recebe o HTML bruto da página e
              * transforma esse HTML em um objeto Document. Esse Document é uma árvore DOM
              */
 
-            // Acessa o site e baixa o HTML
-            Document document = Jsoup.connect(url)
+            // Acessa o site e baixa o HTML - url
+            Document document = Jsoup.connect(urlWithTodos)
                     .userAgent("Mozilla/5.0") // finge ser um navegador
                     .timeout(15_000)
                     .get();
 
             // INICIO EXTRACAO DE DADOS
             // Seleciona cada card de viagem - elemento PAI
-            Elements trips = document.select("li[itemtype='https://schema.org/BusTrip']");
+            trips = document.select("li[itemtype='https://schema.org/BusTrip']");
+
+            // Se não houver resultados, tenta a URL sem 'todos'
+            if (trips.isEmpty()) {
+                document = Jsoup.connect(urlWithoutTodos)
+                        .userAgent("Mozilla/5.0")
+                        .timeout(15_000)
+                        .get();
+                trips = document.select("li[itemtype='https://schema.org/BusTrip']");
+            }
 
             // Para cada viagem, extraímos os dados
             for (Element trip : trips) {

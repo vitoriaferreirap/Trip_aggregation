@@ -65,7 +65,7 @@ public class TripResponse {
         return platform;
     }
 
-    public String getcompany() {
+    public String getCompany() {
         return company;
     }
 

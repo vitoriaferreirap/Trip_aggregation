@@ -10,11 +10,15 @@ public class TripRequest {
     private LocalDate date; // apenas data sem fuso
 
     // construtor
-    public TripRequest() {
-    }
 
     public String getOrigin() {
         return origin;
+    }
+
+    public TripRequest(String origin, String destination, LocalDate date) {
+        this.origin = origin;
+        this.destination = destination;
+        this.date = date;
     }
 
     public void setOrigin(String origin) {

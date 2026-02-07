@@ -65,7 +65,13 @@ https://rodoviariacuritiba.com.br/passagens-de-onibus/{originSlug}-para-{destina
 - Aplica Regex e regras manuais.
 
 ---
+### Services
+ service
+ ├── AutomatedSearchService   ← executa buscas
+ ├── PriceSnapshotService     ← persiste dados
+ └── PriceAnalysisService     ← compara histórico
 
+ 
 ## Dificuldades Encontradas
 
 - Acesso correto aos dados de UF da API (IBGE).
