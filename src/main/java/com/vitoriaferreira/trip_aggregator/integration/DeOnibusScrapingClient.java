@@ -63,103 +63,113 @@ public class DeOnibusScrapingClient {
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
         // Montagem da URL exatamente como o site usa
-        String urlWithTodos = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
-                + originSlug + "-todos-para-" + destinationSlug + "-todos"
-                + "?departureDate=" + formattedDate;
+        String baseUrl = "https://rodoviariacuritiba.com.br/passagens-de-onibus/";
 
-        String urlWithoutTodos = "https://rodoviariacuritiba.com.br/passagens-de-onibus/"
-                + originSlug + "-para-" + destinationSlug + "-todos"
-                + "?departureDate=" + formattedDate;
+        String[] urls = {
+                baseUrl + originSlug + "-para-" + destinationSlug + "-todos?departureDate=" + formattedDate,
+                baseUrl + originSlug + "-todos-para-" + destinationSlug + "?departureDate=" + formattedDate,
+                baseUrl + originSlug + "-para-" + destinationSlug + "?departureDate=" + formattedDate,
+                baseUrl + originSlug + "-todos-para-" + destinationSlug + "-todos?departureDate=" + formattedDate
+
+        };
 
         Elements trips = new Elements();
-        try {
-            /**
-             * Jsoup faz uma requisição HTTP real, recebe o HTML bruto da página e
-             * transforma esse HTML em um objeto Document. Esse Document é uma árvore DOM
-             */
 
-            // Acessa o site e baixa o HTML - url
-            Document document = Jsoup.connect(urlWithTodos)
-                    .userAgent("Mozilla/5.0") // finge ser um navegador
-                    .timeout(15_000)
-                    .get();
+        /**
+         * Jsoup faz uma requisição HTTP real, recebe o HTML bruto da página e
+         * transforma esse HTML em um objeto Document. Esse Document é uma árvore DOM
+         */
 
-            // INICIO EXTRACAO DE DADOS
-            // Seleciona cada card de viagem - elemento PAI
-            trips = document.select("li[itemtype='https://schema.org/BusTrip']");
+        Document document = null;
 
-            // Se não houver resultados, tenta a URL sem 'todos'
-            if (trips.isEmpty()) {
-                document = Jsoup.connect(urlWithoutTodos)
+        for (String url : urls) {
+            try {
+                document = Jsoup.connect(url)
                         .userAgent("Mozilla/5.0")
                         .timeout(15_000)
                         .get();
+
                 trips = document.select("li[itemtype='https://schema.org/BusTrip']");
+
+                if (!trips.isEmpty()) {
+                    break; // achou uma URL válida
+                }
+
+            } catch (IOException e) {
+                // 404 ou erro de rota → tenta a próxima URL
+                continue;
             }
+        }
+        if (trips.isEmpty()) {
+            throw new IllegalStateException(
+                    "Página carregada, mas viagens são renderizadas via JavaScript. Jsoup não suporta esse fluxo.");
+        }
 
-            // Para cada viagem, extraímos os dados
-            for (Element trip : trips) {
-                // dentro dessa árvore HTML, me devolva todos os nós que representam uma viagem
-                // aqui o site usou itemprop, que é uma marcação semântica estavel
+        // Para cada viagem, extraímos os dados
+        for (Element trip : trips) {
+            // dentro dessa árvore HTML, me devolva todos os nós que representam uma viagem
+            // aqui o site usou itemprop, que é uma marcação semântica estavel
 
-                // Horário de partida
-                String departureTime = trip.select("span[itemprop='departureTime']")
-                        .text(); // EXRAR TEXTO DENTRO DAS
+            // Horário de partida
+            String departureTime = trip.select("span[itemprop='departureTime']")
+                    .text(); // EXRAR TEXTO DENTRO DAS
 
-                // Horario de chegada
-                String arrivalTime = trip.selectFirst("span[itemprop='arrivalTime']")
-                        .text();
+            // Horario de chegada
+            String arrivalTime = trip.selectFirst("span[itemprop='arrivalTime']")
+                    .text();
 
-                // Preço
-                String price = trip.select("span[itemprop='price']")
-                        .text();
+            // Preço
+            String price = trip.select("span[itemprop='price']")
+                    .text();
 
-                // Cidade de origem
-                String originCity = trip.select("div[itemprop='departureBusStop'] span")
-                        .first()
-                        .text();
+            // Cidade de origem
+            String originCity = trip.select("div[itemprop='departureBusStop'] span")
+                    .first()
+                    .text();
 
-                // Cidade de destino
-                String destinationCity = trip.select("div[itemprop='arrivalBusStop'] span")
-                        .first()
-                        .text();
+            // Cidade de destino
+            String destinationCity = trip.select("div[itemprop='arrivalBusStop'] span")
+                    .first()
+                    .text();
 
-                // operador de viacao - empresa onibus
-                String company = trip.selectFirst("div[itemprop='Provider'] span").text();
-
-                /**
-                 * Texto bruto do card inteiro.
-                 * Aqui vem TUDO misturado:
-                 * horário, duração, poltrona, embarque fácil
-                 * ex: me de todo o texto dessa card, mesmo que baguncado
-                 */
-                String rawText = trip.text();
-
-                // CONVERSOES:
-                // Extrações usando lista para filtros
-                String seatType = extractSeatType(rawText);
-
-                // Conversão de preço - string para BigDecima
-                // remove separacao de milhar e converte o separador decimap para padrao java
-                BigDecimal priceValue = new BigDecimal(price.replace(".", "").replace(",", "."));
-
-                // Cria o objeto TripResponse
-                TripResponse objTrip = new TripResponse(
-                        originCity,
-                        destinationCity,
-                        date,
-                        departureTime,
-                        arrivalTime,
-                        seatType,
-                        priceValue,
-                        company,
-                        PLATFORM_NAME);
-
-                results.add(objTrip);
+            Element providerEl = trip.selectFirst("[itemprop=Provider], [itemprop=provider]");
+            String company;
+            if (providerEl != null) {
+                company = providerEl.text();
+            } else {
+                company = "Viagem com conexão.";
             }
+            ;
 
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao acessar o site externo.", e);
+            /**
+             * Texto bruto do card inteiro.
+             * Aqui vem TUDO misturado:
+             * horário, duração, poltrona, embarque fácil
+             * ex: me de todo o texto dessa card, mesmo que baguncado
+             */
+            String rawText = trip.text();
+
+            // CONVERSOES:
+            // Extrações usando lista para filtros
+            String seatType = extractSeatType(rawText);
+
+            // Conversão de preço - string para BigDecima
+            // remove separacao de milhar e converte o separador decimap para padrao java
+            BigDecimal priceValue = new BigDecimal(price.replace(".", "").replace(",", "."));
+
+            // Cria o objeto TripResponse
+            TripResponse objTrip = new TripResponse(
+                    originCity,
+                    destinationCity,
+                    date,
+                    departureTime,
+                    arrivalTime,
+                    seatType,
+                    priceValue,
+                    company,
+                    PLATFORM_NAME);
+
+            results.add(objTrip);
         }
 
         return results;
