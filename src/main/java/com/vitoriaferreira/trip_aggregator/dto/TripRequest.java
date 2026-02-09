@@ -6,11 +6,11 @@ public class TripRequest {
     // DTO ENTRADA - minha API solicita o que quer buscar
     // encapsulamento
     private String origin;
+
     private String destination;
     private LocalDate date; // apenas data sem fuso
 
     // construtor
-
     public String getOrigin() {
         return origin;
     }

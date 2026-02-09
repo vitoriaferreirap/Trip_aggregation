@@ -32,7 +32,7 @@ public class AutomatedSearchService {
             // chama service e metodo de busca retornando dados do site TripResponse
             List<TripResponse> trips = tripService.searchTrips(request);
 
-            priceSnapshotService.save(trips);
+            // priceSnapshotService.save(trips);
         }
     }
 }

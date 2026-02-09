@@ -18,9 +18,13 @@ public class PriceSnapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "origin_city")
     private String originCity;
+    @Column(name = "destination_city")
     private String destinationCity;
+    @Column(name = "travel_date")
     private LocalDate travelDate;
+
     private String departureTime;
     private String arrivalTime;
     private String seatType;

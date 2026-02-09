@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.vitoriaferreira.trip_aggregator.entity.PriceSnapshot;
 
+// repository reposnavel por persistir dados de retorno
 @Repository
 public interface PriceSnapshotRepository
         extends JpaRepository<PriceSnapshot, Long> {
@@ -31,10 +32,10 @@ public interface PriceSnapshotRepository
             "AND p.originCity IN ('curitiba','florianopolis','porto alegre') " +
             "AND p.destinationCity = :destination " +
             "AND p.collectedAt BETWEEN :start AND :end")
+
     Double findAveragePriceByRouteAndPeriod(
             @Param("origin") String origin,
             @Param("destination") String destination,
             @Param("start") Instant start,
             @Param("end") Instant end);
-
 }
