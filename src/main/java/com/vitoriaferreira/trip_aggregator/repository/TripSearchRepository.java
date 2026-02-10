@@ -1,5 +1,6 @@
 package com.vitoriaferreira.trip_aggregator.repository;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +12,10 @@ import com.vitoriaferreira.trip_aggregator.entity.TripSearch;
 @Repository
 public interface TripSearchRepository extends JpaRepository<TripSearch, Long> {
 
-    boolean existsByOriginAndDestinationAndTravelDate(
+    // after olha no momento que o dia comecou para frente > 00h
+    boolean existsByOriginAndDestinationAndTravelDateAndInstantSearchAfter(
             String origin,
             String destination,
-            LocalDate travelDate);
+            LocalDate travelDate,
+            Instant InstantTime);
 }

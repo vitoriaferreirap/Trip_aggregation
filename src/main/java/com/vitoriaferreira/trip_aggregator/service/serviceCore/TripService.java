@@ -2,6 +2,7 @@ package com.vitoriaferreira.trip_aggregator.service.serviceCore;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -53,13 +54,19 @@ public class TripService {
         // Recebe o retorno que o scraping produziu
         List<TripResponse> scrapedTrip = deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
 
+        // startOfToday não pega a hora de agora, pega o momento exato em que o dia de
+        // hoje começou 00h.
+        Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
         // inicio dominio - chama repository passando dados de DTO de entrada
-        boolean alreadyPersisted = tripSearchRepository.existsByOriginAndDestinationAndTravelDate(originSlug,
-                destinationSlug,
-                date);
+        boolean alreadySearchedToday = tripSearchRepository
+                .existsByOriginAndDestinationAndTravelDateAndInstantSearchAfter(
+                        originSlug,
+                        destinationSlug,
+                        date,
+                        startOfToday);
 
         // validando retorno e persistencia se necessario
-        if (!alreadyPersisted) {
+        if (!alreadySearchedToday) {
             // salva nova entity no banco com dados de DTO de entrada
             TripSearch search = new TripSearch(
                     originSlug, destinationSlug, date, Instant.now());
