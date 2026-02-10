@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vitoriaferreira.trip_aggregator.dto.TripRequest;
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
-import com.vitoriaferreira.trip_aggregator.service.TripService;
+import com.vitoriaferreira.trip_aggregator.dto.request.TripRequest;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
+import com.vitoriaferreira.trip_aggregator.service.serviceCore.TripService;
 
 @RestController
 @RequestMapping("/trips")

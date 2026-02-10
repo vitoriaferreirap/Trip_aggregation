@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.service;
+package com.vitoriaferreira.trip_aggregator.service.serviceStrategy;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

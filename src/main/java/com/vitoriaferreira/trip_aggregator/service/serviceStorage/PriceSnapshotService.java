@@ -1,11 +1,11 @@
-package com.vitoriaferreira.trip_aggregator.service;
+package com.vitoriaferreira.trip_aggregator.service.serviceStorage;
 
 import java.time.Instant;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
 import com.vitoriaferreira.trip_aggregator.entity.PriceSnapshot;
 import com.vitoriaferreira.trip_aggregator.repository.PriceSnapshotRepository;
 

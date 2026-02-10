@@ -1,99 +1,52 @@
-# Sistema de Comparação de Passagens de Ônibus
+# Passagens Insight 
 
-Este projeto tem como **objetivo principal o aprendizado de web scraping**, utilizando Java, Jsoup e uma arquitetura em camadas.
+O **Passagens Insight** é uma plataforma inteligente de monitoramento e análise de preços de passagens de ônibus. O sistema transforma dados brutos extraídos via Web Scraping em um histórico estruturado, permitindo identificar oportunidades de economia através de inteligência de dados.
 
-Projeto **com proposito educacional**  é importante ressaltar que web scraping deve ser feito com responsabilidade ética.
-
-Embora o sistema possua características de um produto real (API REST, services, DTOs e integração com dados oficiais), o foco está em **entender como projetar, implementar e manter scrapers**, considerando que **cada site possui HTML, regras e limitações próprias**.
-
-A aplicação irá evoluir para um sistema de comparação de passagens de ônibus, agregando preços e horários de **três plataformas diferentes**.  
-Neste primeiro momento, apenas uma plataforma está integrada.
+> **Status do Projeto:** Em desenvolvimento (Fase de implementação da Automação e Alertas).
 
 ---
 
-## Visão Geral da Arquitetura
+## Objetivo do Projeto
+Este projeto foi idealizado para aplicar conceitos avançados de **Desenvolvimento Java/Spring**, focando em:
+* **Web Scraping:** Extração de dados de fontes sem APIs públicas.
+* **Arquitetura em Camadas:** Organização de código focada em manutenção e escalabilidade.
+* **Tratamento de Dados:** Normalização de informações desestruturadas para persistência em bancos relacionais.
 
-O sistema segue uma arquitetura em camadas, separando responsabilidades para evitar acoplamento entre scraping, regras de negócio e exposição da API.
-Essa separação é essencial porque **scraping é volátil**: mudanças no HTML não devem impactar controllers ou DTOs.
-
----
-
-## Fluxo Funcional da Busca de Viagens
-
-1. Usuário escolhe cidade de origem e destino.
-2. Autocomplete retorna `CityResponse` (nome da cidade + UF) API IBGE.
-3. A aplicação gera os slugs (`toSlug`) a partir do nome e estado.
-4. Usuário informa a data da viagem (`LocalDate`).
-5. O service chama `searchTrips(originSlug, destinationSlug, date)`.
-6. A URL é montada e o HTML é baixado.
-7. Jsoup percorre o DOM e extrai horários, preços e destinos.
-8. Dados são normalizados e retornados ao frontend.
+## Tecnologias Utilizadas
+* **Java 17** & **Spring Boot 3**
+* **Spring Data JPA** & **PostgreSQL** (Persistência e Séries Temporais)
+* **Jsoup** (Motor de extração HTML)
+* **API do IBGE** (Normalização dinâmica de localidades)
+* **Spring Scheduling** (Automação de tarefas em segundo plano)
 
 ---
 
-## Padrão de URL Utilizado no Scraping
+## Decisões de Engenharia
+Diferente de scripts de busca simples, o Passagens Insight foi projetado seguindo princípios de **Clean Code** e **SOLID**:
 
-```
-https://rodoviariacuritiba.com.br/passagens-de-onibus/{originSlug}-para-{destinationSlug}-todos?departureDate={dd/MM/yyyy}
-```
+* **Separação de Responsabilidades (SRP):** Cada serviço cuida de uma parte do processo (busca, normalização, comparação ou alerta).
+* **Desacoplamento:** O sistema utiliza **DTOs** para garantir que a lógica de negócio seja independente da origem dos dados.
+* **Idempotência:** Filtros inteligentes que evitam a persistência de buscas duplicadas no mesmo dia, otimizando o armazenamento.
 
----
 
-## Controllers e Casos de Uso
-
-| Controller / Service | Função |
-|---------------------|--------|
-| **CityController / CityService** | Autocomplete via IBGE. Sem scraping. |
-| **TripController / TripService** | Busca real de viagens via scraping. |
 
 ---
 
-## Estratégias de Extração com Jsoup
-
-### Abordagem 1 — `select().text()` (HTML estruturado)
-
-- Usada quando o HTML possui marcação confiável.
-- `select()` navega pelo DOM.
-- `.text()` retorna o valor em texto do elemento HTML.
+## Documentação Detalhada
+Para uma visão profunda sobre a arquitetura, os fluxos de dados, e as regras de negócio aplicadas, acesse:
+[**Visualizar Documento de System Design**](SYSTEM_DESIGN.md)
 
 ---
 
-### Abordagem 2 — `.text()` + Regex (HTML mal estruturado)
-
-- Usada quando o HTML não é confiável.
-- Extrai texto bruto do bloco.
-- Aplica Regex e regras manuais.
-
----
-### Services
- service
- ├── AutomatedSearchService   ← executa buscas
- ├── PriceSnapshotService     ← persiste dados
- └── PriceAnalysisService     ← compara histórico
-
- 
-## Dificuldades Encontradas
-
-- Acesso correto aos dados de UF da API (IBGE).
-- Extração em páginas sem identificadores confiáveis.
-- Cada site exige uma estratégia de scraping diferente.
-
-- Detectar variações relevantes de preço ao longo do tempo para a mesma rota e gerar alertas automáticos quando houver queda significativa em relação ao histórico recente.
+## Funcionalidades e Roadmap
+- [x] **Integração IBGE:** Normalização de cidades e UFs para buscas precisas.
+- [x] **Scraping:** Extração resiliente de preços, horários e empresas.
+- [x] **Histórico de Preços:** Persistência automática de fotos de preço (Snapshots).
+- [x] **Comparação Real-time:** Identificação imediata da melhor oferta para o usuário.
+- [ ] **Automação (Scheduler):** Coleta diária de preços nas capitais do Sul (Em progresso).
+- [ ] **Monitor de Alertas:** Notificação de queda de preço baseada em média histórica.
 
 ---
 
-## Analise media e porcentual
-- Preço fora do padrão histórico
-- “Essa passagem está mais barata do que o normal para essa rota.”
-- Detectar quando o preço atual de uma rota está abaixo do padrão histórico dessa mesma rota.
-- “O preço atual dessa rota está barato comparado com o que normalmente custa?”
-- Se sim → gera alerta.
-
-## Considerações Finais
-
-O foco do projeto é o **aprendizado do processo de scraping**:
-
-- Análise de HTML real
-- Arquitetura preparada para múltiplos scrapers
-- Separação clara de responsabilidades
-- Registro de decisões técnicas
+## Aviso Ético
+Este projeto possui fins **estritamente educacionais**. O Web Scraping é realizado de forma responsável, com intervalos de tempo que respeitam a carga dos servidores e visando apenas o estudo de técnicas de extração e análise de dados.

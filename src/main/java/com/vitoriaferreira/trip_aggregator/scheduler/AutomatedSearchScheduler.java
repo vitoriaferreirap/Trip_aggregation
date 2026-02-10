@@ -2,9 +2,9 @@ package com.vitoriaferreira.trip_aggregator.scheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
-import com.vitoriaferreira.trip_aggregator.service.AutomatedSearchService;
-import com.vitoriaferreira.trip_aggregator.service.PriceSnapshotService;
-import com.vitoriaferreira.trip_aggregator.service.TripService;
+import com.vitoriaferreira.trip_aggregator.service.serviceAutomation.AutomatedSearchService;
+import com.vitoriaferreira.trip_aggregator.service.serviceCore.TripService;
+import com.vitoriaferreira.trip_aggregator.service.serviceStorage.PriceSnapshotService;
 
 public class AutomatedSearchScheduler {
 

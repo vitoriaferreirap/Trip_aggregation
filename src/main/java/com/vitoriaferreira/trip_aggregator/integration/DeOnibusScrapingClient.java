@@ -13,7 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
 
 /**
  * Esta classe é responsável por fazer SCRAPING.
@@ -70,7 +70,6 @@ public class DeOnibusScrapingClient {
                 baseUrl + originSlug + "-todos-para-" + destinationSlug + "?departureDate=" + formattedDate,
                 baseUrl + originSlug + "-para-" + destinationSlug + "?departureDate=" + formattedDate,
                 baseUrl + originSlug + "-todos-para-" + destinationSlug + "-todos?departureDate=" + formattedDate
-
         };
 
         Elements trips = new Elements();

@@ -1,10 +1,10 @@
-package com.vitoriaferreira.trip_aggregator.service;
+package com.vitoriaferreira.trip_aggregator.service.serviceStrategy;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
 
 @Service
 public class PricingComparisonService {

@@ -1,11 +1,13 @@
-package com.vitoriaferreira.trip_aggregator.service;
+package com.vitoriaferreira.trip_aggregator.service.serviceAutomation;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import com.vitoriaferreira.trip_aggregator.dto.RouteAutomatedSearch;
-import com.vitoriaferreira.trip_aggregator.dto.TripRequest;
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+import com.vitoriaferreira.trip_aggregator.dto.automation.RouteAutomatedSearch;
+import com.vitoriaferreira.trip_aggregator.dto.request.TripRequest;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
+import com.vitoriaferreira.trip_aggregator.service.serviceCore.TripService;
+import com.vitoriaferreira.trip_aggregator.service.serviceStorage.PriceSnapshotService;
 
 public class AutomatedSearchService {
 

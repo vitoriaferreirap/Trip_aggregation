@@ -6,12 +6,13 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.vitoriaferreira.trip_aggregator.dto.CityResponse;
+import com.vitoriaferreira.trip_aggregator.dto.response.CityResponse;
 
 @Component
 public class IBGECityClient {
 
     private static final String IBGE_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios";
+    // leva pedido ate a API
     private final RestTemplate restTemplate = new RestTemplate();
 
     @SuppressWarnings("unchecked") // retira avisos

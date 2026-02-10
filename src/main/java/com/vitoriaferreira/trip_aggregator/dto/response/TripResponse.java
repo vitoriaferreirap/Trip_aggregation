@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.dto;
+package com.vitoriaferreira.trip_aggregator.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

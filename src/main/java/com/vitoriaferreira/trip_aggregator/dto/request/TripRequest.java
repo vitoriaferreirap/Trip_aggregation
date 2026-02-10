@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.dto;
+package com.vitoriaferreira.trip_aggregator.dto.request;
 
 import java.time.LocalDate;
 

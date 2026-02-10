@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.service;
+package com.vitoriaferreira.trip_aggregator.service.serviceCore;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -6,11 +6,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.vitoriaferreira.trip_aggregator.dto.TripRequest;
-import com.vitoriaferreira.trip_aggregator.dto.TripResponse;
+import com.vitoriaferreira.trip_aggregator.dto.request.TripRequest;
+import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
 import com.vitoriaferreira.trip_aggregator.entity.TripSearch;
 import com.vitoriaferreira.trip_aggregator.integration.DeOnibusScrapingClient;
 import com.vitoriaferreira.trip_aggregator.repository.TripSearchRepository;
+import com.vitoriaferreira.trip_aggregator.service.serviceStorage.PriceSnapshotService;
+import com.vitoriaferreira.trip_aggregator.service.serviceStrategy.PricingComparisonService;
 
 @Service
 public class TripService {

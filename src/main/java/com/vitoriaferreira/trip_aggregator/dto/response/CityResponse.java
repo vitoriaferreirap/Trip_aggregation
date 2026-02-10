@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.dto;
+package com.vitoriaferreira.trip_aggregator.dto.response;
 
 public class CityResponse {
     // mapea dados retornados do ibge em JSON para obj JAVA

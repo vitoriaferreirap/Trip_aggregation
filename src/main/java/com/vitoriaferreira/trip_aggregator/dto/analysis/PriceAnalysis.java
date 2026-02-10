@@ -1,4 +1,4 @@
-package com.vitoriaferreira.trip_aggregator.dto;
+package com.vitoriaferreira.trip_aggregator.dto.analysis;
 
 import java.math.BigDecimal;
 
