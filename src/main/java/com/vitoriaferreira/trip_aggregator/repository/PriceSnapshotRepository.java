@@ -1,6 +1,7 @@
 package com.vitoriaferreira.trip_aggregator.repository;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -33,9 +34,15 @@ public interface PriceSnapshotRepository
             "AND p.destinationCity = :destination " +
             "AND p.collectedAt BETWEEN :start AND :end")
 
+    // Automacao
     Double findAveragePriceByRouteAndPeriod(
             @Param("origin") String origin,
             @Param("destination") String destination,
             @Param("start") Instant start,
             @Param("end") Instant end);
+
+    // Busca entidade banco por id de busca
+    // O Spring entende que deve olhar para a entidade 'tripSearch'
+    // e filtrar pelo atributo 'id' dela.
+    List<PriceSnapshot> findByTripSearchId_Id(Long id);
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -44,44 +45,45 @@ public class TripService {
      */
     public List<TripResponse> searchTrips(TripRequest request) {
 
-        // request.getOrigin() - apenas transporta dados de entrada/ dto para leitura
-        // dado devolvido - retorno ja resolvido - slug e normalizacao
-        // cityService.toSlug(originSlug) - string normalizada retorn
         String originSlug = cityService.toSlug(request.getOrigin());
         String destinationSlug = cityService.toSlug(request.getDestination());
         LocalDate date = request.getDate();
 
-        // Recebe o retorno que o scraping produziu
-        List<TripResponse> scrapedTrip = deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
-
-        // startOfToday não pega a hora de agora, pega o momento exato em que o dia de
-        // hoje começou 00h.
+        // startOfToday pega o momento exato em que o dia de começou 00h.
         Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
-        // inicio dominio - chama repository passando dados de DTO de entrada
-        boolean alreadySearchedToday = tripSearchRepository
-                .existsByOriginAndDestinationAndTravelDateAndInstantSearchAfter(
-                        originSlug,
-                        destinationSlug,
-                        date,
-                        startOfToday);
 
-        // validando retorno e persistencia se necessario
-        if (!alreadySearchedToday) {
-            // salva nova entity no banco com dados de DTO de entrada
-            TripSearch search = new TripSearch(
-                    originSlug, destinationSlug, date, Instant.now());
+        /**
+         * Verifica se a busca foi feita no dia
+         * Option - vazio ou contem exatamente um unico objeto(Pai)
+         */
+        Optional<TripSearch> searchExistente = tripSearchRepository
+                .findFirstByOriginAndDestinationAndTravelDateAndInstantSearchAfterOrderByInstantSearchDesc(
+                        originSlug, destinationSlug, date, startOfToday);
 
-            tripSearchRepository.save(search);
-            // delegacao de responsavilidade
-            priceSnapshotService.save(scrapedTrip);
+        List<TripResponse> scrapedTrip;
+
+        // Se o Optional estiver vazio, fazemos o scraping
+        if (searchExistente.isEmpty()) {
+            System.out.println("Busca não salva, fazendo novo scrapig");
+            scrapedTrip = deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
+
+            TripSearch search = new TripSearch(originSlug, destinationSlug, date, Instant.now());
+
+            // salva nova busca e gera ID dela
+            TripSearch searchSalva = tripSearchRepository.save(search);
+
+            // response do scraping e a busca atual salva e seu id(fk de pricesnapshot)
+            priceSnapshotService.save(scrapedTrip, searchSalva);
+        } else {
+            System.out.println("Busca já feita hoje!Recuperando do banco!");
+
+            // id busca que optional trouxe PAI
+            Long buscaId = searchExistente.get().getId();
+
+            // chamamos o service para busca os FILHOS
+            scrapedTrip = priceSnapshotService.buscaPorId(buscaId);
+            System.out.println("Recuperados " + scrapedTrip.size()); // numero de objs
         }
-
-        // Recebe retorno do findCheapestTrip
-        // esse server orquestra essa operacao, incia e finaliza
-        TripResponse cheapestTrip = pricingComparisonService.findCheapestTrip(scrapedTrip);
-        System.out.println("MAIS BARATA: " + cheapestTrip.getCompany() + " " + cheapestTrip.getPrice());
-
-        // nao executa nada novo, na volta ira retornar o que o scraping ja produziu
         return scrapedTrip;
     }
 

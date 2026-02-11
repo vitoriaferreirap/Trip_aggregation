@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 // modela como os dados são armazenados no banco. Usa JPA/HIBERNAT
 // específico.
@@ -18,13 +20,9 @@ public class PriceSnapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "origin_city")
     private String originCity;
-    @Column(name = "destination_city")
     private String destinationCity;
-    @Column(name = "travel_date")
     private LocalDate travelDate;
-
     private String departureTime;
     private String arrivalTime;
     private String seatType;
@@ -34,9 +32,22 @@ public class PriceSnapshot {
     // mesmo que alguém tente update, o Hibernate não inclui o campo no SQL
     @Column(nullable = false, updatable = false)
     private Instant collectedAt;// data e hora do momento da coleta
+    // MUITOS para UM
+    @ManyToOne
+    @JoinColumn(name = "trip_search_id")
+    private TripSearch tripSearchId;
+
+    /**
+     * Necessario para segunda busca: código chamou o Repository para "ler" do
+     * banco. Para transformar a linha do SQL em um objeto Java, o Hibernate precisa
+     * desse construtor vazio para "nascer" o objeto.
+     */
+    public PriceSnapshot() {
+    }
 
     public PriceSnapshot(String originCity, String destinationCity, LocalDate travelDate, String departureTime,
-            String arrivalTime, String seatType, String company, BigDecimal price, Instant collectedAt) {
+            String arrivalTime, String seatType, String company, BigDecimal price, Instant collectedAt,
+            TripSearch tripSearchId) {
         this.originCity = originCity;
         this.destinationCity = destinationCity;
         this.travelDate = travelDate;
@@ -46,6 +57,7 @@ public class PriceSnapshot {
         this.company = company;
         this.price = price;
         this.collectedAt = collectedAt;
+        this.tripSearchId = tripSearchId;
     }
 
     public Long getId() {
@@ -86,6 +98,10 @@ public class PriceSnapshot {
 
     public Instant getCollectedAt() {
         return collectedAt;
+    }
+
+    public TripSearch getTripSearchId() {
+        return tripSearchId;
     }
 
 }
