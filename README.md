@@ -4,6 +4,9 @@ O **Passagens Insight** é uma plataforma inteligente de monitoramento e anális
 
 > **Status do Projeto:** Em desenvolvimento (Fase de implementação da Automação e Alertas).
 
+### Automação & Resiliência
+Implementei uma solução de scraping resiliente utilizando **Playwright** para superar desafios de renderização dinâmica (JavaScript) e mitigar bloqueios de IP, aplicando técnicas de rotação de URLs e emulação de comportamento humano. Isso garante a extração de dados mesmo em interfaces modernas e protegidas.o.
+
 ---
 
 ## Objetivo do Projeto
@@ -13,11 +16,12 @@ Este projeto foi idealizado para aplicar conceitos avançados de **Desenvolvimen
 * **Tratamento de Dados:** Normalização de informações desestruturadas para persistência em bancos relacionais.
 
 ## Tecnologias Utilizadas
-* **Java 17** & **Spring Boot 3**
-* **Spring Data JPA** & **PostgreSQL** (Persistência e Séries Temporais)
-* **Jsoup** (Motor de extração HTML)
-* **API do IBGE** (Normalização dinâmica de localidades)
-* **Spring Scheduling** (Automação de tarefas em segundo plano)
+* **Java 17 & Spring Boot 3** - Base robusta para o desenvolvimento do ecossistema.
+* **Playwright** - Automação de navegador para renderização de JavaScript e bypass de proteções.
+* **Jsoup** - Parsing eficiente de dados HTML estruturados.
+* **Spring Data JPA & PostgreSQL** - Modelagem relacional e persistência de dados.
+* **Spring Scheduling** - Agendamento de tarefas para monitoramento contínuo.
+* **API do IBGE** - Padronização e normalização de nomes de cidades e estados.
 
 ---
 

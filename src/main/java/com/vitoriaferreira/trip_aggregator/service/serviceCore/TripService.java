@@ -61,6 +61,7 @@ public class TripService {
                         originSlug, destinationSlug, date, startOfToday);
 
         List<TripResponse> scrapedTrip;
+        TripResponse chearper;
 
         // Se o Optional estiver vazio, fazemos o scraping
         if (searchExistente.isEmpty()) {
@@ -74,6 +75,11 @@ public class TripService {
 
             // response do scraping e a busca atual salva e seu id(fk de pricesnapshot)
             priceSnapshotService.save(scrapedTrip, searchSalva);
+
+            // comparacao do mais barato local, da busca atual
+            chearper = pricingComparisonService.findCheapestTrip(scrapedTrip);
+            System.out.println("Passagens mais barata da busca: " + chearper.getPrice());
+
         } else {
             System.out.println("Busca já feita hoje!Recuperando do banco!");
 
@@ -83,7 +89,10 @@ public class TripService {
             // chamamos o service para busca os FILHOS
             scrapedTrip = priceSnapshotService.buscaPorId(buscaId);
             System.out.println("Recuperados " + scrapedTrip.size()); // numero de objs
+            chearper = pricingComparisonService.findCheapestTrip(scrapedTrip);
+            System.out.println("Passagens mais barata da busca: " + chearper.getPrice());
         }
+
         return scrapedTrip;
     }
 
