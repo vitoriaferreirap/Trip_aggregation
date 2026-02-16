@@ -4,6 +4,8 @@
 **Autor:** Vitória Ferreira  
 **Status:** Estrutura Base Concluída / Módulo de Automação em Implementação
 
+
+![alt text](desingSystem.png)
 ---
 
 ## 1. Visão Geral

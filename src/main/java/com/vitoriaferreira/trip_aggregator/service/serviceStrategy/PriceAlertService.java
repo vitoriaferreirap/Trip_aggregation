@@ -9,6 +9,7 @@ import com.vitoriaferreira.trip_aggregator.repository.PriceSnapshotRepository;
 
 @Service
 public class PriceAlertService {
+    // Promotion Detector and Lead Time Curve
 
     private final PriceSnapshotRepository repository;
 
@@ -32,12 +33,12 @@ public class PriceAlertService {
         // Definição do intervalo entre dois instates - periodo
         // inicio do periodo atual = now - 3 (tres ultimos dias ate agora)
         // como se fosse essa semana
-        Instant startCurrentPeriod = now.minus(3, ChronoUnit.DAYS);
+        Instant startCurrentPeriod = now.minus(1, ChronoUnit.DAYS);
 
         // como se fosse semana passada
         // inicio do periodo anterior = now - 6 (tres ultimos dias ANTES dos 3 do
         // periodo atual)
-        Instant startPreviousPeriod = now.minus(6, ChronoUnit.DAYS);
+        Instant startPreviousPeriod = now.minus(2, ChronoUnit.DAYS);
 
         // Média da semana passada com a atual
         Double avgPreviousPeriod = repository.findAveragePriceByRouteAndPeriod(

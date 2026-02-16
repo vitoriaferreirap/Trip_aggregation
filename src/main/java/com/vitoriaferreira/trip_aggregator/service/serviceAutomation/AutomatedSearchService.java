@@ -3,20 +3,23 @@ package com.vitoriaferreira.trip_aggregator.service.serviceAutomation;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.vitoriaferreira.trip_aggregator.dto.automation.RouteAutomatedSearch;
 import com.vitoriaferreira.trip_aggregator.dto.request.TripRequest;
-import com.vitoriaferreira.trip_aggregator.dto.response.TripResponse;
 import com.vitoriaferreira.trip_aggregator.service.serviceCore.TripService;
-import com.vitoriaferreira.trip_aggregator.service.serviceStorage.PriceSnapshotService;
+import com.vitoriaferreira.trip_aggregator.service.serviceStrategy.PriceAlertService;
 
+@Service
 public class AutomatedSearchService {
+    // Orquestra o tempo e as rotas da automacao
 
     private final TripService tripService;
-    private final PriceSnapshotService priceSnapshotService;
+    private final PriceAlertService priceAlertService;
 
-    public AutomatedSearchService(TripService tripService, PriceSnapshotService priceSnapshotService) {
+    public AutomatedSearchService(TripService tripService, PriceAlertService priceAlertService) {
         this.tripService = tripService;
-        this.priceSnapshotService = priceSnapshotService;
+        this.priceAlertService = priceAlertService;
     }
 
     public void execute() {
@@ -30,11 +33,30 @@ public class AutomatedSearchService {
 
         for (RouteAutomatedSearch route : routes) {
             // envio de dados de entrada
-            TripRequest request = new TripRequest(route.getOrigin(), route.getDestination(), LocalDate.now());
-            // chama service e metodo de busca retornando dados do site TripResponse
-            List<TripResponse> trips = tripService.searchTrips(request);
+            try {
+                System.out.println(
+                        "Iniciando busca automatizada: " + route.getOrigin() + " para " + route.getDestination());
 
-            // priceSnapshotService.save(trips);
+                // alvo da busca dia atual + 1
+                LocalDate dataAlvo = LocalDate.now().plusDays(1);
+                TripRequest request = new TripRequest(route.getOrigin(), route.getDestination(), dataAlvo);
+
+                // TripService aplica a logica necessaria para a busca
+                tripService.searchTrips(request);
+
+                // busca que foi feita, pede analise do banco
+                priceAlertService.analyzePriceDrop(route.getOrigin(), route.getDestination());
+
+                // JITTER
+                // Espera entre 15 e 30 segundos antes de ir para a próxima cidade
+                long delay = 15000 + (long) (Math.random() * 15000);
+                Thread.sleep(delay);
+
+            } catch (Exception e) {
+                System.err.println("❌ Falha na automação da rota " + route.getOrigin() + ": " + e.getMessage());
+                // Se der erro de Timeout (bloqueio)
+                break;
+            }
         }
     }
 }
