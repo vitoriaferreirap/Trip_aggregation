@@ -13,7 +13,7 @@ on:
 jobs: 
   rodar_automacao:
     #maquina virtual SO
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     #passos dentro do job
     steps:
