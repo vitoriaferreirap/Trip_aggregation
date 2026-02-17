@@ -39,6 +39,7 @@ public class AutomatedSearchService {
 
                 // alvo da busca dia atual + 1
                 LocalDate dataAlvo = LocalDate.now().plusDays(1);
+                // DTO de entrada
                 TripRequest request = new TripRequest(route.getOrigin(), route.getDestination(), dataAlvo);
 
                 // TripService aplica a logica necessaria para a busca
@@ -53,7 +54,7 @@ public class AutomatedSearchService {
                 Thread.sleep(delay);
 
             } catch (Exception e) {
-                System.err.println("❌ Falha na automação da rota " + route.getOrigin() + ": " + e.getMessage());
+                System.err.println("Falha na automação da rota " + route.getOrigin() + ": " + e.getMessage());
                 // Se der erro de Timeout (bloqueio)
                 break;
             }

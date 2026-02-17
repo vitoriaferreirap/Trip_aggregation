@@ -18,16 +18,16 @@ public class AutomatedSearchScheduler {
      * SCHADULER
      * componente que executa uma tarefa automaticamente
      * em horários ou intervalos definidos.
-     * Configuraçào de tempo
+     * Configuraçào de TEMPO
      */
 
     // Executa uma vez por dia, mas com um "sorteio" inicial
     @Scheduled(initialDelay = 1000, fixedDelay = 86400000)
     public void runAutomatedScheduler() {
         // Gera um atraso aleatório entre 1 e 30 minutos antes da busca do dia anterior
-        long randomDelay = (long) (Math.random() * 30 * 60 * 1000);
+        long randomDelay = (long) (Math.random() * 30 * 1000);
         try {
-            System.out.println("Aguardando " + (randomDelay / 60000) + " minutos para iniciar busca ética...");
+            System.out.println("Aguardando " + (randomDelay / 60000) + " minutos para iniciar busca");
             Thread.sleep(randomDelay);
             automatedSearchService.execute();
         } catch (InterruptedException e) {
