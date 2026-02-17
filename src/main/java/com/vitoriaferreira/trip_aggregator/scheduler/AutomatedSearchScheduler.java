@@ -15,16 +15,19 @@ public class AutomatedSearchScheduler {
     }
 
     /**
-     * SCHADULER
-     * componente que executa uma tarefa automaticamente
-     * em horários ou intervalos definidos.
-     * Configuraçào de TEMPO
+     * SCHEDULER(agendador)
+     * - Componente que executa uma tarefa automaticamente
+     * - GitHub Action (cron): Garante que o processo aconteça uma vez por dia.
+     * - initialDelay(automacao inicia 1 segundo apos spring estar rodando )
+     * - fixedDelay(define intervalo entre excecucoes caso sitema permaneca ligado
+     * 24hx24h)
+     * - System.exit: Garante que o GitHub Actions saiba que o trabalho acabou
+     * e desligue a vm, ignora fixedDelay
+     * - Script de Inicialização com Jitter(gera atraso entre requisicoes diarias)
      */
 
-    // Executa uma vez por dia, mas com um "sorteio" inicial
     @Scheduled(initialDelay = 1000, fixedDelay = 86400000)
     public void runAutomatedScheduler() {
-        // Gera um atraso aleatório entre 1 e 30 minutos antes da busca do dia anterior
         long randomDelay = (long) (Math.random() * 30 * 1000);
         try {
             System.out.println("Aguardando " + (randomDelay / 60000) + " minutos para iniciar busca");
@@ -33,5 +36,6 @@ public class AutomatedSearchScheduler {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+        System.exit(0);
     }
 }

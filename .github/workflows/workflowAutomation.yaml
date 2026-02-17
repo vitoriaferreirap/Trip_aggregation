@@ -1,0 +1,43 @@
+name: Automação de Scraping e Analise de preços
+
+# evento que sera disparado
+on: 
+  schedule:
+    #Decide quando liga a vm
+    #Todo dia às 03:00 AM (Horário de Brasília) UTC tem fuso horario
+    #(cron): Garante que o processo aconteça uma vez por dia.
+    - cron: '0 6 * * *'
+  #permite rodar pelo botao do github
+  workflow_dispatch:
+
+jobs: 
+  rodar_automacao:
+    #maquina virtual SO
+    runs-on: ubuntu-latest
+
+    #passos dentro do job
+    steps:
+      #clone repositorio para MV
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+      
+      # instala dependencias necessarias
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with: #passa argumentos
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      #instala dependencias do linux que o PLAYWRIGHT precisa
+      - name: Instalar dependências do Playwright
+        run: mvn playwright:install-deps
+
+      #executo projeto spring boot
+      - name: Executar automacao
+        env: 
+          ##variaveis ambiente banco de dados
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: mvn spring-boot:run
