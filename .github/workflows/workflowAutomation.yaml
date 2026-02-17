@@ -31,7 +31,7 @@ jobs:
 
       #instala dependencias do linux que o PLAYWRIGHT precisa
       - name: Instalar dependências do Playwright
-        run: mvn playwright:install-deps
+        run: mvn exec:java -e -Dexec.mainClass="com.microsoft.playwright.CLI" -Dexec.args="install-deps"
 
       #executo projeto spring boot
       - name: Executar automacao
