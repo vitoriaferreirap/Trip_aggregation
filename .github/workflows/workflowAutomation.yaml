@@ -36,7 +36,7 @@ jobs:
       - name: Executar automacao
         env: 
           ##variaveis ambiente banco de dados
-          DB_URL: ${{ vars.DB_URL }}
+          DB_URL: ${{ secrets.DB_URL }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: mvn spring-boot:run 
