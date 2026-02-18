@@ -30,14 +30,13 @@ jobs:
           cache: 'maven'
 
       #instala dependencias do linux que o PLAYWRIGHT precisa
-      - name: Instalar dependências do Playwright
-        run: mvn exec:java -e -Dexec.mainClass="com.microsoft.playwright.CLI" -Dexec.args="install-deps"
-
+      - name: Install Playwright Browsers
+        run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps chromium"
       #executo projeto spring boot
       - name: Executar automacao
         env: 
           ##variaveis ambiente banco de dados
-          DB_URL: ${{ secrets.DB_URL }}
+          DB_URL: ${{ vars.DB_URL }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: mvn spring-boot:run
+        run: mvn spring-boot:run 
