@@ -54,18 +54,18 @@ public class TripService {
 
         /**
          * Verifica se a busca foi feita no dia
-         * Option - vazio ou contem exatamente um unico objeto(Pai)
+         * Optional - vazio ou contem exatamente um unico objeto(Pai)
          */
         Optional<TripSearch> searchExistente = tripSearchRepository
                 .findFirstByOriginAndDestinationAndTravelDateAndInstantSearchAfterOrderByInstantSearchDesc(
                         originSlug, destinationSlug, date, startOfToday);
 
         List<TripResponse> scrapedTrip;
-        TripResponse chearper;
+        TripResponse cheaper;
 
         // Se o Optional estiver vazio, fazemos o scraping
         if (searchExistente.isEmpty()) {
-            System.out.println("Busca não salva, fazendo novo scrapig");
+            System.out.println("Busca não salva, fazendo novo scraping");
             scrapedTrip = deOnibusScrapingClient.searchTrips(originSlug, destinationSlug, date);
 
             TripSearch search = new TripSearch(originSlug, destinationSlug, date, Instant.now());
@@ -77,8 +77,8 @@ public class TripService {
             priceSnapshotService.save(scrapedTrip, searchSalva);
 
             // comparacao do mais barato local, da busca atual
-            chearper = pricingComparisonService.findCheapestTrip(scrapedTrip);
-            System.out.println("Passagens mais barata da busca: " + chearper.getPrice());
+            cheaper = pricingComparisonService.findCheapestTrip(scrapedTrip);
+            System.out.println("Passagens mais barata da busca: " + cheaper.getPrice());
 
         } else {
             System.out.println("Busca já feita hoje!Recuperando do banco!");
@@ -89,8 +89,8 @@ public class TripService {
             // chamamos o service para busca os FILHOS
             scrapedTrip = priceSnapshotService.buscaPorId(buscaId);
             System.out.println("Recuperados " + scrapedTrip.size()); // numero de objs
-            chearper = pricingComparisonService.findCheapestTrip(scrapedTrip);
-            System.out.println("Passagens mais barata da busca: " + chearper.getPrice());
+            cheaper = pricingComparisonService.findCheapestTrip(scrapedTrip);
+            System.out.println("Passagens mais barata da busca: " + cheaper.getPrice());
         }
 
         return scrapedTrip;
